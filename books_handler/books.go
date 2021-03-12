@@ -1,4 +1,4 @@
-package books_helper
+package books_handler
 
 import (
 	"context"
