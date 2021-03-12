@@ -14,7 +14,7 @@ import (
 )
 
 // Helper function to connect to MongoDB
-func ConnectDB() *mongo.Collection {
+func ConnectDB() *mongo.Database {
 	config := GetConfiguration()
 	// set client options
 	clientOptions := options.Client().ApplyURI(config.ConnectionString)
@@ -28,7 +28,7 @@ func ConnectDB() *mongo.Collection {
 
 	fmt.Println("Connected to MongoDB!")
 
-	collection := client.Database("go_rest_api").Collection("books")
+	collection := client.Database("go_rest_api")
 
 	return collection
 }
@@ -71,6 +71,9 @@ func GetConfiguration() Configuration {
 		os.Getenv("PORT"),
 		os.Getenv("CONNECTION_STRING"),
 	}
+
+	serverRunning := "Server running on port " + configuration.Port
+  fmt.Println(serverRunning)
 
 	return configuration
 }
