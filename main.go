@@ -136,9 +136,28 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
+func deleteBook(w http.ResponseWriter, r *http.Request) {
+	// Set headers
+	w.Header().Set("Content-Type", "application/json")
 
+	// get route params
+	var params = mux.Vars(r)
 
+	// convert param to objectid
+	id, err := primitive.ObjectIDFromHex(params["id"])
 
+	// prepare filter
+	filter := bson.M{"_id": id}
+
+	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
+
+	if err != nil {
+		helper.GetError(err, w)
+		return
+	}
+
+	json.NewEncoder(w).Encode(deleteResult)
+}
 
 func main() {
 	//Init Router
@@ -148,33 +167,9 @@ func main() {
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/books", createBook).Methods("POST")
 	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
-	// r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
+	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
 	config := helper.GetConfiguration()
 	log.Fatal(http.ListenAndServe(config.Port, r))
 
 }
-
-
-
-// func main() {
-// 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017/"))
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-// 	err = client.Connect(ctx)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer client.Disconnect(ctx)
-// 	err = client.Ping(ctx, readpref.Primary())
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	databases, err := client.ListDatabaseNames(ctx, bson.M{})
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	fmt.Println(databases)
-// }
