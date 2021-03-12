@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var collection = helper.ConnectDB()
@@ -53,6 +54,29 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
+func getBook(w http.ResponseWriter, r *http.Request) {
+	// set the header
+	w.Header().Set("Content-Type", "application/json")
+
+	var book models.Book
+	// get route params with mux
+	var params = mux.Vars(r)
+
+	// string to primitive.ObjectId
+	id, _ := primitive.ObjectIDFromHex(params["id"])
+
+	// creates a filter
+	filter := bson.M{"_id": id}
+	err := collection.FindOne(context.TODO(), filter).Decode(&book)
+
+	if err != nil {
+		helper.GetError(err, w)
+		return
+	}
+
+	json.NewEncoder(w).Encode(book)
+}
+
 
 
 
@@ -62,7 +86,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
-	// r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
+	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	// r.HandleFunc("/api/books", createBook).Methods("POST")
 	// r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
 	// r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
