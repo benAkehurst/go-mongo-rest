@@ -77,6 +77,25 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
+func createBook(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var book models.Book
+
+	// decode body of request
+	_ = json.NewDecoder(r.Body).Decode(&book)
+
+	// insert book model into collection
+	result, err := collection.InsertOne(context.TODO(), book)
+
+	if err != nil {
+		helper.GetError(err, w)
+		return
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
 
 
 
@@ -87,7 +106,7 @@ func main() {
 
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
-	// r.HandleFunc("/api/books", createBook).Methods("POST")
+	r.HandleFunc("/api/books", createBook).Methods("POST")
 	// r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
 	// r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
