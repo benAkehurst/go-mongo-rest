@@ -1,4 +1,4 @@
-package dogs_handler
+package dogs_api
 
 import (
 	"encoding/json"

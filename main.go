@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	books_handler "quickstart/books_handler"
-	"quickstart/dogs_handler"
+	dogs_api "quickstart/dogs_api"
 	"quickstart/helper"
 
 	"github.com/gorilla/mux"
@@ -22,7 +22,7 @@ func main() {
 	r.HandleFunc("/api/books/{id}", books_handler.DeleteBook).Methods("DELETE")
 
 	// Dog routes
-	r.HandleFunc("/api/dogs/random", dogs_handler.GetRandomDog).Methods("GET")
+	r.HandleFunc("/api/dogs/random", dogs_api.GetRandomDog).Methods("GET")
 
 	config := helper.GetConfiguration()
 	log.Fatal(http.ListenAndServe(config.Port, r))
